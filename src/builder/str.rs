@@ -246,10 +246,7 @@ pub(crate) mod inner {
         }
 
         pub(crate) fn into_string(self) -> String {
-            match self {
-                Self::Static(s) => s.to_owned(),
-                Self::Owned(s) => s.into(),
-            }
+            self.as_str().to_owned()
         }
     }
 }

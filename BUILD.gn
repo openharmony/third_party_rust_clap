@@ -20,7 +20,7 @@ ohos_cargo_crate("lib") {
 
   sources = [ "src/lib.rs" ]
   edition = "2021"
-  cargo_pkg_version = "4.1.13"
+  cargo_pkg_version = "4.1.4"
   cargo_pkg_name = "clap"
   cargo_pkg_description = "A simple to use, efficient, and full-featured Command Line Argument Parser"
   deps = [
@@ -49,7 +49,7 @@ ohos_cargo_crate("stdio_fixture") {
 
   sources = [ "src/bin/stdio-fixture.rs" ]
   edition = "2021"
-  cargo_pkg_version = "4.1.13"
+  cargo_pkg_version = "4.1.4"
   cargo_pkg_name = "clap"
   cargo_pkg_description = "A simple to use, efficient, and full-featured Command Line Argument Parser"
   deps = [

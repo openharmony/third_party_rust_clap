@@ -7,10 +7,8 @@
 //! # Examples
 //!
 //! ```rust
-//! use std::path::PathBuf;
-//!
-//! type BoxedError = Box<dyn std::error::Error + Send + Sync>;
-//!
+//! # use std::path::PathBuf;
+//! # type BoxedError = Box<dyn std::error::Error + Send + Sync>;
 //! #[derive(Debug)]
 //! struct Args {
 //!     paths: Vec<PathBuf>,
