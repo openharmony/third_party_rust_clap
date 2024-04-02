@@ -14,20 +14,20 @@
 import("//build/ohos.gni")
 
 ohos_cargo_crate("lib") {
-    crate_name = "clap_derive"
-    crate_type = "proc-macro"
-    crate_root = "src/lib.rs"
+  crate_name = "clap_derive"
+  crate_type = "proc-macro"
+  crate_root = "src/lib.rs"
 
-    sources = ["src/lib.rs"]
-    edition = "2021"
-    cargo_pkg_version = "4.1.0"
-    cargo_pkg_name = "clap_derive"
-    cargo_pkg_description = "Parse command line argument by defining a struct, derive crate."
-    deps = [
-        "//third_party/rust/crates/heck:lib",
-        "//third_party/rust/crates/proc-macro2:lib",
-        "//third_party/rust/crates/proc-macro-error:lib",
-        "//third_party/rust/crates/quote:lib",
-        "//third_party/rust/crates/syn:lib",
-    ]
+  sources = [ "src/lib.rs" ]
+  edition = "2021"
+  cargo_pkg_version = "4.1.12"
+  cargo_pkg_name = "clap_derive"
+  cargo_pkg_description =
+      "Parse command line argument by defining a struct, derive crate."
+  deps = [
+    "//third_party/rust/crates/heck:lib",
+    "//third_party/rust/crates/proc-macro2:lib",
+    "//third_party/rust/crates/quote:lib",
+    "//third_party/rust/crates/syn:lib",
+  ]
 }
