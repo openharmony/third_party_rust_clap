@@ -11,11 +11,11 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Adds files to myapp
-    Add(AddArgs),
+    Add(Add),
 }
 
 #[derive(Args)]
-struct AddArgs {
+struct Add {
     name: Option<String>,
 }
 

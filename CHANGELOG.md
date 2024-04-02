@@ -18,65 +18,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
-## [4.1.13] - 2023-03-18
-
-### Performance
-
-- Reduce repeated alloc calls when building a `Command`
-- Reduce duplicate dependencies for faster builds
-
-## [4.1.12] - 2023-03-18
-
-### Internal
-
-- *(derive)* Update to `syn` v2
-
-### Performance
-
-- *(derive)* Faster build times by dropping `proc-macro-error` dependency
-
-## [4.1.11] - 2023-03-17
-
-### Internal
-
-- Update `bitflags`
-
-## [4.1.10] - 2023-03-17
-
-### Fixes
-
-- *(help)* On Windows, avoid underlined text artifacts
-
-## [4.1.9] - 2023-03-16
-
-### Fixes
-
-- *(assert)* Improve the assert when using the wrong action with `get_count` / `get_flag`
-
-## [4.1.8] - 2023-02-27
-
-### Fixes
-
-- *(derive)* Don't `deny` lints on the users behalf
-
-## [4.1.7] - 2023-02-27
-
-### Fixes
-
-- *(derive)* Hide some nightly clippy warnings
-
-## [4.1.6] - 2023-02-15
-
-### Fixes
-
-- *(help)* Don't show long help for `--help` just because hidden possible values include a description
-
-## [4.1.5] - 2023-02-15
-
-### Fixes
-
-- *(help)* Don't show long help for `--help` just because a hidden arg has a possible value with a description
-
 ## [4.1.4] - 2023-01-24
 
 ### Fixes
@@ -4178,16 +4119,7 @@ Minimum version of Rust is now v1.13.0 (Stable)
 * **arg**  allow lifetimes other than 'static in arguments ([9e8c1fb9](https://github.com/clap-rs/clap/commit/9e8c1fb9406f8448873ca58bab07fe905f1551e5))
 
 <!-- next-url -->
-[Unreleased]: https://github.com/clap-rs/clap/compare/v4.1.13...HEAD
-[4.1.13]: https://github.com/clap-rs/clap/compare/v4.1.12...v4.1.13
-[4.1.12]: https://github.com/clap-rs/clap/compare/v4.1.11...v4.1.12
-[4.1.11]: https://github.com/clap-rs/clap/compare/v4.1.10...v4.1.11
-[4.1.10]: https://github.com/clap-rs/clap/compare/v4.1.9...v4.1.10
-[4.1.9]: https://github.com/clap-rs/clap/compare/v4.1.8...v4.1.9
-[4.1.8]: https://github.com/clap-rs/clap/compare/v4.1.7...v4.1.8
-[4.1.7]: https://github.com/clap-rs/clap/compare/v4.1.6...v4.1.7
-[4.1.6]: https://github.com/clap-rs/clap/compare/v4.1.5...v4.1.6
-[4.1.5]: https://github.com/clap-rs/clap/compare/v4.1.4...v4.1.5
+[Unreleased]: https://github.com/clap-rs/clap/compare/v4.1.4...HEAD
 [4.1.4]: https://github.com/clap-rs/clap/compare/v4.1.3...v4.1.4
 [4.1.3]: https://github.com/clap-rs/clap/compare/v4.1.2...v4.1.3
 [4.1.2]: https://github.com/clap-rs/clap/compare/v4.1.1...v4.1.2

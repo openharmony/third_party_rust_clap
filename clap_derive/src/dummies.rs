@@ -1,20 +1,23 @@
 //! Dummy implementations that we emit along with an error.
 
 use proc_macro2::Ident;
+use proc_macro_error::append_dummy;
 use quote::quote;
 
-#[must_use]
-pub fn parser(name: &Ident) -> proc_macro2::TokenStream {
-    let into_app = into_app(name);
-    quote!(
-        impl clap::Parser for #name {}
-        #into_app
-    )
+pub fn parser_struct(name: &Ident) {
+    into_app(name);
+    args(name);
+    append_dummy(quote!( impl clap::Parser for #name {} ));
 }
 
-#[must_use]
-pub fn into_app(name: &Ident) -> proc_macro2::TokenStream {
-    quote! {
+pub fn parser_enum(name: &Ident) {
+    into_app(name);
+    subcommand(name);
+    append_dummy(quote!( impl clap::Parser for #name {} ));
+}
+
+pub fn into_app(name: &Ident) {
+    append_dummy(quote! {
         impl clap::CommandFactory for #name {
             fn command<'b>() -> clap::Command {
                 unimplemented!()
@@ -23,12 +26,11 @@ pub fn into_app(name: &Ident) -> proc_macro2::TokenStream {
                 unimplemented!()
             }
         }
-    }
+    });
 }
 
-#[must_use]
-pub fn from_arg_matches(name: &Ident) -> proc_macro2::TokenStream {
-    quote! {
+pub fn from_arg_matches(name: &Ident) {
+    append_dummy(quote! {
         impl clap::FromArgMatches for #name {
             fn from_arg_matches(_m: &clap::ArgMatches) -> ::std::result::Result<Self, clap::Error> {
                 unimplemented!()
@@ -37,13 +39,12 @@ pub fn from_arg_matches(name: &Ident) -> proc_macro2::TokenStream {
                 unimplemented!()
             }
         }
-    }
+    });
 }
 
-#[must_use]
-pub fn subcommand(name: &Ident) -> proc_macro2::TokenStream {
-    let from_arg_matches = from_arg_matches(name);
-    quote! {
+pub fn subcommand(name: &Ident) {
+    from_arg_matches(name);
+    append_dummy(quote! {
         impl clap::Subcommand for #name {
             fn augment_subcommands(_cmd: clap::Command) -> clap::Command {
                 unimplemented!()
@@ -55,14 +56,12 @@ pub fn subcommand(name: &Ident) -> proc_macro2::TokenStream {
                 unimplemented!()
             }
         }
-        #from_arg_matches
-    }
+    });
 }
 
-#[must_use]
-pub fn args(name: &Ident) -> proc_macro2::TokenStream {
-    let from_arg_matches = from_arg_matches(name);
-    quote! {
+pub fn args(name: &Ident) {
+    from_arg_matches(name);
+    append_dummy(quote! {
         impl clap::Args for #name {
             fn augment_args(_cmd: clap::Command) -> clap::Command {
                 unimplemented!()
@@ -71,13 +70,11 @@ pub fn args(name: &Ident) -> proc_macro2::TokenStream {
                 unimplemented!()
             }
         }
-        #from_arg_matches
-    }
+    });
 }
 
-#[must_use]
-pub fn value_enum(name: &Ident) -> proc_macro2::TokenStream {
-    quote! {
+pub fn value_enum(name: &Ident) {
+    append_dummy(quote! {
         impl clap::ValueEnum for #name {
             fn value_variants<'a>() -> &'a [Self]{
                 unimplemented!()
@@ -89,5 +86,5 @@ pub fn value_enum(name: &Ident) -> proc_macro2::TokenStream {
                 unimplemented!()
             }
         }
-    }
+    })
 }

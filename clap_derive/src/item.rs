@@ -16,6 +16,7 @@ use std::env;
 
 use heck::{ToKebabCase, ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use proc_macro2::{self, Span, TokenStream};
+use proc_macro_error::abort;
 use quote::{format_ident, quote, quote_spanned, ToTokens};
 use syn::DeriveInput;
 use syn::{self, ext::IdentExt, spanned::Spanned, Attribute, Field, Ident, LitStr, Type, Variant};
@@ -52,7 +53,7 @@ pub struct Item {
 }
 
 impl Item {
-    pub fn from_args_struct(input: &DeriveInput, name: Name) -> Result<Self, syn::Error> {
+    pub fn from_args_struct(input: &DeriveInput, name: Name) -> Self {
         let ident = input.ident.clone();
         let span = input.ident.span();
         let attrs = &input.attrs;
@@ -61,15 +62,15 @@ impl Item {
         let kind = Sp::new(Kind::Command(Sp::new(Ty::Other, span)), span);
 
         let mut res = Self::new(name, ident, None, argument_casing, env_casing, kind);
-        let parsed_attrs = ClapAttr::parse_all(attrs)?;
-        res.infer_kind(&parsed_attrs)?;
-        res.push_attrs(&parsed_attrs)?;
+        let parsed_attrs = ClapAttr::parse_all(attrs);
+        res.infer_kind(&parsed_attrs);
+        res.push_attrs(&parsed_attrs);
         res.push_doc_comment(attrs, "about", Some("long_about"));
 
-        Ok(res)
+        res
     }
 
-    pub fn from_subcommand_enum(input: &DeriveInput, name: Name) -> Result<Self, syn::Error> {
+    pub fn from_subcommand_enum(input: &DeriveInput, name: Name) -> Self {
         let ident = input.ident.clone();
         let span = input.ident.span();
         let attrs = &input.attrs;
@@ -78,15 +79,15 @@ impl Item {
         let kind = Sp::new(Kind::Command(Sp::new(Ty::Other, span)), span);
 
         let mut res = Self::new(name, ident, None, argument_casing, env_casing, kind);
-        let parsed_attrs = ClapAttr::parse_all(attrs)?;
-        res.infer_kind(&parsed_attrs)?;
-        res.push_attrs(&parsed_attrs)?;
+        let parsed_attrs = ClapAttr::parse_all(attrs);
+        res.infer_kind(&parsed_attrs);
+        res.push_attrs(&parsed_attrs);
         res.push_doc_comment(attrs, "about", Some("long_about"));
 
-        Ok(res)
+        res
     }
 
-    pub fn from_value_enum(input: &DeriveInput, name: Name) -> Result<Self, syn::Error> {
+    pub fn from_value_enum(input: &DeriveInput, name: Name) -> Self {
         let ident = input.ident.clone();
         let span = input.ident.span();
         let attrs = &input.attrs;
@@ -95,9 +96,9 @@ impl Item {
         let kind = Sp::new(Kind::Value, span);
 
         let mut res = Self::new(name, ident, None, argument_casing, env_casing, kind);
-        let parsed_attrs = ClapAttr::parse_all(attrs)?;
-        res.infer_kind(&parsed_attrs)?;
-        res.push_attrs(&parsed_attrs)?;
+        let parsed_attrs = ClapAttr::parse_all(attrs);
+        res.infer_kind(&parsed_attrs);
+        res.push_attrs(&parsed_attrs);
         // Ignoring `push_doc_comment` as there is no top-level clap builder to add documentation
         // to
 
@@ -109,14 +110,14 @@ impl Item {
             );
         }
 
-        Ok(res)
+        res
     }
 
     pub fn from_subcommand_variant(
         variant: &Variant,
         struct_casing: Sp<CasingStyle>,
         env_casing: Sp<CasingStyle>,
-    ) -> Result<Self, syn::Error> {
+    ) -> Self {
         let name = variant.ident.clone();
         let ident = variant.ident.clone();
         let span = variant.span();
@@ -137,9 +138,9 @@ impl Item {
             env_casing,
             kind,
         );
-        let parsed_attrs = ClapAttr::parse_all(&variant.attrs)?;
-        res.infer_kind(&parsed_attrs)?;
-        res.push_attrs(&parsed_attrs)?;
+        let parsed_attrs = ClapAttr::parse_all(&variant.attrs);
+        res.infer_kind(&parsed_attrs);
+        res.push_attrs(&parsed_attrs);
         if matches!(&*res.kind, Kind::Command(_) | Kind::Subcommand(_)) {
             res.push_doc_comment(&variant.attrs, "about", Some("long_about"));
         }
@@ -163,14 +164,14 @@ impl Item {
             | Kind::Arg(_) => (),
         }
 
-        Ok(res)
+        res
     }
 
     pub fn from_value_enum_variant(
         variant: &Variant,
         argument_casing: Sp<CasingStyle>,
         env_casing: Sp<CasingStyle>,
-    ) -> Result<Self, syn::Error> {
+    ) -> Self {
         let ident = variant.ident.clone();
         let span = variant.span();
         let kind = Sp::new(Kind::Value, span);
@@ -182,21 +183,21 @@ impl Item {
             env_casing,
             kind,
         );
-        let parsed_attrs = ClapAttr::parse_all(&variant.attrs)?;
-        res.infer_kind(&parsed_attrs)?;
-        res.push_attrs(&parsed_attrs)?;
+        let parsed_attrs = ClapAttr::parse_all(&variant.attrs);
+        res.infer_kind(&parsed_attrs);
+        res.push_attrs(&parsed_attrs);
         if matches!(&*res.kind, Kind::Value) {
             res.push_doc_comment(&variant.attrs, "help", None);
         }
 
-        Ok(res)
+        res
     }
 
     pub fn from_args_field(
         field: &Field,
         struct_casing: Sp<CasingStyle>,
         env_casing: Sp<CasingStyle>,
-    ) -> Result<Self, syn::Error> {
+    ) -> Self {
         let name = field.ident.clone().unwrap();
         let ident = field.ident.clone().unwrap();
         let span = field.span();
@@ -210,9 +211,9 @@ impl Item {
             env_casing,
             kind,
         );
-        let parsed_attrs = ClapAttr::parse_all(&field.attrs)?;
-        res.infer_kind(&parsed_attrs)?;
-        res.push_attrs(&parsed_attrs)?;
+        let parsed_attrs = ClapAttr::parse_all(&field.attrs);
+        res.infer_kind(&parsed_attrs);
+        res.push_attrs(&parsed_attrs);
         if matches!(&*res.kind, Kind::Arg(_)) {
             res.push_doc_comment(&field.attrs, "help", Some("long_help"));
         }
@@ -243,7 +244,7 @@ impl Item {
             | Kind::ExternalSubcommand => {}
         }
 
-        Ok(res)
+        res
     }
 
     fn new(
@@ -328,7 +329,7 @@ impl Item {
         }
     }
 
-    fn infer_kind(&mut self, attrs: &[ClapAttr]) -> Result<(), syn::Error> {
+    fn infer_kind(&mut self, attrs: &[ClapAttr]) {
         for attr in attrs {
             if let Some(AttrValue::Call(_)) = &attr.value {
                 continue;
@@ -338,7 +339,7 @@ impl Item {
             let kind = match &attr.magic {
                 Some(MagicAttrName::FromGlobal) => {
                     if attr.value.is_some() {
-                        let expr = attr.value_or_abort()?;
+                        let expr = attr.value_or_abort();
                         abort!(expr, "attribute `{}` does not accept a value", attr.name);
                     }
                     let ty = self
@@ -351,7 +352,7 @@ impl Item {
                 }
                 Some(MagicAttrName::Subcommand) if attr.value.is_none() => {
                     if attr.value.is_some() {
-                        let expr = attr.value_or_abort()?;
+                        let expr = attr.value_or_abort();
                         abort!(expr, "attribute `{}` does not accept a value", attr.name);
                     }
                     let ty = self
@@ -364,7 +365,7 @@ impl Item {
                 }
                 Some(MagicAttrName::ExternalSubcommand) if attr.value.is_none() => {
                     if attr.value.is_some() {
-                        let expr = attr.value_or_abort()?;
+                        let expr = attr.value_or_abort();
                         abort!(expr, "attribute `{}` does not accept a value", attr.name);
                     }
                     let kind = Sp::new(Kind::ExternalSubcommand, attr.name.clone().span());
@@ -372,7 +373,7 @@ impl Item {
                 }
                 Some(MagicAttrName::Flatten) if attr.value.is_none() => {
                     if attr.value.is_some() {
-                        let expr = attr.value_or_abort()?;
+                        let expr = attr.value_or_abort();
                         abort!(expr, "attribute `{}` does not accept a value", attr.name);
                     }
                     let ty = self
@@ -395,14 +396,12 @@ impl Item {
             };
 
             if let Some(kind) = kind {
-                self.set_kind(kind)?;
+                self.set_kind(kind);
             }
         }
-
-        Ok(())
     }
 
-    fn push_attrs(&mut self, attrs: &[ClapAttr]) -> Result<(), syn::Error> {
+    fn push_attrs(&mut self, attrs: &[ClapAttr]) {
         for attr in attrs {
             let actual_attr_kind = *attr.kind.get();
             let expected_attr_kind = self.kind.attr_kind();
@@ -438,7 +437,7 @@ impl Item {
 
             match &attr.magic {
                 Some(MagicAttrName::Short) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.push_method(
                         *attr.kind.get(),
@@ -448,13 +447,13 @@ impl Item {
                 }
 
                 Some(MagicAttrName::Long) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.push_method(*attr.kind.get(), attr.name.clone(), self.name.clone().translate(*self.casing));
                 }
 
                 Some(MagicAttrName::ValueParser) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.deprecations.push(Deprecation {
                         span: attr.name.span(),
@@ -466,7 +465,7 @@ impl Item {
                 }
 
                 Some(MagicAttrName::Action) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.deprecations.push(Deprecation {
                         span: attr.name.span(),
@@ -478,7 +477,7 @@ impl Item {
                 }
 
                 Some(MagicAttrName::Env) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.push_method(
                         *attr.kind.get(),
@@ -488,7 +487,7 @@ impl Item {
                 }
 
                 Some(MagicAttrName::ValueEnum) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.is_enum = true
                 }
@@ -498,45 +497,45 @@ impl Item {
                 }
 
                 Some(MagicAttrName::About) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Command])?;
+                    assert_attr_kind(attr, &[AttrKind::Command]);
 
                     if let Some(method) =
-                        Method::from_env(attr.name.clone(), "CARGO_PKG_DESCRIPTION")?
+                        Method::from_env(attr.name.clone(), "CARGO_PKG_DESCRIPTION")
                     {
                         self.methods.push(method);
                     }
                 }
 
                 Some(MagicAttrName::LongAbout) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Command])?;
+                    assert_attr_kind(attr, &[AttrKind::Command]);
 
                     self.force_long_help = true;
                 }
 
                 Some(MagicAttrName::LongHelp) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     self.force_long_help = true;
                 }
 
                 Some(MagicAttrName::Author) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Command])?;
+                    assert_attr_kind(attr, &[AttrKind::Command]);
 
-                    if let Some(method) = Method::from_env(attr.name.clone(), "CARGO_PKG_AUTHORS")? {
+                    if let Some(method) = Method::from_env(attr.name.clone(), "CARGO_PKG_AUTHORS") {
                         self.methods.push(method);
                     }
                 }
 
                 Some(MagicAttrName::Version) if attr.value.is_none() => {
-                    assert_attr_kind(attr, &[AttrKind::Command])?;
+                    assert_attr_kind(attr, &[AttrKind::Command]);
 
-                    if let Some(method) = Method::from_env(attr.name.clone(), "CARGO_PKG_VERSION")? {
+                    if let Some(method) = Method::from_env(attr.name.clone(), "CARGO_PKG_VERSION") {
                         self.methods.push(method);
                     }
                 }
 
                 Some(MagicAttrName::DefaultValueT) => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     let ty = if let Some(ty) = self.ty.as_ref() {
                         ty
@@ -544,7 +543,7 @@ impl Item {
                         abort!(
                             attr.name.clone(),
                             "#[arg(default_value_t)] (without an argument) can be used \
-                            only on field level\n\n= note: {note}\n\n",
+                            only on field level";
 
                             note = "see \
                                 https://github.com/clap-rs/clap/blob/master/examples/derive_ref/README.md#magic-attributes")
@@ -584,7 +583,7 @@ impl Item {
                 }
 
                 Some(MagicAttrName::DefaultValuesT) => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     let ty = if let Some(ty) = self.ty.as_ref() {
                         ty
@@ -592,18 +591,18 @@ impl Item {
                         abort!(
                             attr.name.clone(),
                             "#[arg(default_values_t)] (without an argument) can be used \
-                            only on field level\n\n= note: {note}\n\n",
+                            only on field level";
 
                             note = "see \
                                 https://github.com/clap-rs/clap/blob/master/examples/derive_ref/README.md#magic-attributes")
                     };
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
 
                     let container_type = Ty::from_syn_ty(ty);
                     if *container_type != Ty::Vec {
                         abort!(
                             attr.name.clone(),
-                            "#[arg(default_values_t)] can be used only on Vec types\n\n= note: {note}\n\n",
+                            "#[arg(default_values_t)] can be used only on Vec types";
 
                             note = "see \
                                 https://github.com/clap-rs/clap/blob/master/examples/derive_ref/README.md#magic-attributes")
@@ -668,7 +667,7 @@ impl Item {
                 }
 
                 Some(MagicAttrName::DefaultValueOsT) => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     let ty = if let Some(ty) = self.ty.as_ref() {
                         ty
@@ -676,7 +675,7 @@ impl Item {
                         abort!(
                             attr.name.clone(),
                             "#[arg(default_value_os_t)] (without an argument) can be used \
-                            only on field level\n\n= note: {note}\n\n",
+                            only on field level";
 
                             note = "see \
                                 https://github.com/clap-rs/clap/blob/master/examples/derive_ref/README.md#magic-attributes")
@@ -716,7 +715,7 @@ impl Item {
                 }
 
                 Some(MagicAttrName::DefaultValuesOsT) => {
-                    assert_attr_kind(attr, &[AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Arg]);
 
                     let ty = if let Some(ty) = self.ty.as_ref() {
                         ty
@@ -724,18 +723,18 @@ impl Item {
                         abort!(
                             attr.name.clone(),
                             "#[arg(default_values_os_t)] (without an argument) can be used \
-                            only on field level\n\n= note: {note}\n\n",
+                            only on field level";
 
                             note = "see \
                                 https://github.com/clap-rs/clap/blob/master/examples/derive_ref/README.md#magic-attributes")
                     };
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
 
                     let container_type = Ty::from_syn_ty(ty);
                     if *container_type != Ty::Vec {
                         abort!(
                             attr.name.clone(),
-                            "#[arg(default_values_os_t)] can be used only on Vec types\n\n= note: {note}\n\n",
+                            "#[arg(default_values_os_t)] can be used only on Vec types";
 
                             note = "see \
                                 https://github.com/clap-rs/clap/blob/master/examples/derive_ref/README.md#magic-attributes")
@@ -800,29 +799,29 @@ impl Item {
                 }
 
                 Some(MagicAttrName::NextDisplayOrder) => {
-                    assert_attr_kind(attr, &[AttrKind::Command])?;
+                    assert_attr_kind(attr, &[AttrKind::Command]);
 
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
                     self.next_display_order = Some(Method::new(attr.name.clone(), quote!(#expr)));
                 }
 
                 Some(MagicAttrName::NextHelpHeading) => {
-                    assert_attr_kind(attr, &[AttrKind::Command])?;
+                    assert_attr_kind(attr, &[AttrKind::Command]);
 
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
                     self.next_help_heading = Some(Method::new(attr.name.clone(), quote!(#expr)));
                 }
 
                 Some(MagicAttrName::RenameAll) => {
-                    let lit = attr.lit_str_or_abort()?;
-                    self.casing = CasingStyle::from_lit(lit)?;
+                    let lit = attr.lit_str_or_abort();
+                    self.casing = CasingStyle::from_lit(lit);
                 }
 
                 Some(MagicAttrName::RenameAllEnv) => {
-                    assert_attr_kind(attr, &[AttrKind::Command, AttrKind::Arg])?;
+                    assert_attr_kind(attr, &[AttrKind::Command, AttrKind::Arg]);
 
-                    let lit = attr.lit_str_or_abort()?;
-                    self.env_casing = CasingStyle::from_lit(lit)?;
+                    let lit = attr.lit_str_or_abort();
+                    self.env_casing = CasingStyle::from_lit(lit);
                 }
 
                 Some(MagicAttrName::Skip) if actual_attr_kind == AttrKind::Group => {
@@ -840,20 +839,20 @@ impl Item {
                 | Some(MagicAttrName::Author)
                 | Some(MagicAttrName::Version)
                  => {
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
                     self.push_method(*attr.kind.get(), attr.name.clone(), expr);
                 }
 
                 // Magic only for the default, otherwise just forward to the builder
                 Some(MagicAttrName::ValueParser) | Some(MagicAttrName::Action) => {
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
                     self.push_method(*attr.kind.get(), attr.name.clone(), expr);
                 }
 
                 // Directives that never receive a value
                 Some(MagicAttrName::ValueEnum)
                 | Some(MagicAttrName::VerbatimDocComment) => {
-                    let expr = attr.value_or_abort()?;
+                    let expr = attr.value_or_abort();
                     abort!(expr, "attribute `{}` does not accept a value", attr.name);
                 }
 
@@ -884,8 +883,6 @@ impl Item {
                 );
             }
         }
-
-        Ok(())
     }
 
     fn push_doc_comment(&mut self, attrs: &[Attribute], short_name: &str, long_name: Option<&str>) {
@@ -915,7 +912,7 @@ impl Item {
         }
     }
 
-    fn set_kind(&mut self, kind: Sp<Kind>) -> Result<(), syn::Error> {
+    fn set_kind(&mut self, kind: Sp<Kind>) {
         match (self.kind.get(), kind.get()) {
             (Kind::Arg(_), Kind::FromGlobal(_))
             | (Kind::Arg(_), Kind::Subcommand(_))
@@ -935,7 +932,6 @@ impl Item {
                 abort!(kind.span(), "`{}` cannot be used with `{}`", new, old);
             }
         }
-        Ok(())
     }
 
     pub fn find_default_method(&self) -> Option<&Method> {
@@ -1215,21 +1211,19 @@ impl Method {
         Method { name, args }
     }
 
-    fn from_env(ident: Ident, env_var: &str) -> Result<Option<Self>, syn::Error> {
+    fn from_env(ident: Ident, env_var: &str) -> Option<Self> {
         let mut lit = match env::var(env_var) {
             Ok(val) => {
                 if val.is_empty() {
-                    return Ok(None);
+                    return None;
                 }
                 LitStr::new(&val, ident.span())
             }
             Err(_) => {
-                abort!(
-                    ident,
-                    "cannot derive `{}` from Cargo.toml\n\n= note: {note}\n\n= help: {help}\n\n",
-                    ident,
-                    note = format_args!("`{}` environment variable is not set", env_var),
-                    help = format_args!("use `{} = \"...\"` to set {} manually", ident, ident)
+                abort!(ident,
+                    "cannot derive `{}` from Cargo.toml", ident;
+                    note = "`{}` environment variable is not set", env_var;
+                    help = "use `{} = \"...\"` to set {} manually", ident, ident;
                 );
             }
         };
@@ -1239,7 +1233,7 @@ impl Method {
             lit = LitStr::new(&edited, lit.span());
         }
 
-        Ok(Some(Method::new(ident, quote!(#lit))))
+        Some(Method::new(ident, quote!(#lit)))
     }
 
     pub(crate) fn args(&self) -> &TokenStream {
@@ -1305,7 +1299,7 @@ impl ToTokens for Deprecation {
     }
 }
 
-fn assert_attr_kind(attr: &ClapAttr, possible_kind: &[AttrKind]) -> Result<(), syn::Error> {
+fn assert_attr_kind(attr: &ClapAttr, possible_kind: &[AttrKind]) {
     if *attr.kind.get() == AttrKind::Clap || *attr.kind.get() == AttrKind::StructOpt {
         // deprecated
     } else if !possible_kind.contains(attr.kind.get()) {
@@ -1321,7 +1315,6 @@ fn assert_attr_kind(attr: &ClapAttr, possible_kind: &[AttrKind]) -> Result<(), s
             options.join(", ")
         );
     }
-    Ok(())
 }
 
 /// replace all `:` with `, ` when not inside the `<>`
@@ -1371,13 +1364,13 @@ pub enum CasingStyle {
 }
 
 impl CasingStyle {
-    fn from_lit(name: &LitStr) -> Result<Sp<Self>, syn::Error> {
+    fn from_lit(name: &LitStr) -> Sp<Self> {
         use self::CasingStyle::*;
 
         let normalized = name.value().to_upper_camel_case().to_lowercase();
         let cs = |kind| Sp::new(kind, name.span());
 
-        let s = match normalized.as_ref() {
+        match normalized.as_ref() {
             "camel" | "camelcase" => cs(Camel),
             "kebab" | "kebabcase" => cs(Kebab),
             "pascal" | "pascalcase" => cs(Pascal),
@@ -1387,8 +1380,7 @@ impl CasingStyle {
             "upper" | "uppercase" => cs(Upper),
             "verbatim" | "verbatimcase" => cs(Verbatim),
             s => abort!(name, "unsupported casing: `{}`", s),
-        };
-        Ok(s)
+        }
     }
 }
 

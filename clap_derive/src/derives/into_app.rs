@@ -18,11 +18,7 @@ use syn::{Generics, Ident};
 
 use crate::item::Item;
 
-pub fn gen_for_struct(
-    item: &Item,
-    item_name: &Ident,
-    generics: &Generics,
-) -> Result<TokenStream, syn::Error> {
+pub fn gen_for_struct(item: &Item, item_name: &Ident, generics: &Generics) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let name = item.cased_name();
@@ -40,8 +36,8 @@ pub fn gen_for_struct(
             clippy::nursery,
             clippy::cargo,
             clippy::suspicious_else_formatting,
-            clippy::almost_swapped,
         )]
+        #[deny(clippy::correctness)]
         impl #impl_generics clap::CommandFactory for #item_name #ty_generics #where_clause {
             fn command<'b>() -> clap::Command {
                 let #app_var = clap::Command::new(#name);
@@ -55,20 +51,16 @@ pub fn gen_for_struct(
         }
     };
 
-    Ok(tokens)
+    tokens
 }
 
-pub fn gen_for_enum(
-    item: &Item,
-    item_name: &Ident,
-    generics: &Generics,
-) -> Result<TokenStream, syn::Error> {
+pub fn gen_for_enum(item: &Item, item_name: &Ident, generics: &Generics) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let name = item.cased_name();
     let app_var = Ident::new("__clap_app", Span::call_site());
 
-    Ok(quote! {
+    quote! {
         #[allow(dead_code, unreachable_code, unused_variables, unused_braces)]
         #[allow(
             clippy::style,
@@ -80,8 +72,8 @@ pub fn gen_for_enum(
             clippy::nursery,
             clippy::cargo,
             clippy::suspicious_else_formatting,
-            clippy::almost_swapped,
         )]
+        #[deny(clippy::correctness)]
         impl #impl_generics clap::CommandFactory for #item_name #ty_generics #where_clause {
             fn command<'b>() -> clap::Command {
                 let #app_var = clap::Command::new(#name)
@@ -97,5 +89,5 @@ pub fn gen_for_enum(
                     .arg_required_else_help(false)
             }
         }
-    })
+    }
 }

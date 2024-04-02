@@ -37,8 +37,4 @@ _my-app_commands() {
     _describe -t commands 'my-app commands' commands "$@"
 }
 
-if [ "$funcstack[1]" = "_my-app" ]; then
-    _my-app "$@"
-else
-    compdef _my-app my-app
-fi
+_my-app "$@"

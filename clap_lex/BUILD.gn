@@ -14,14 +14,14 @@
 import("//build/ohos.gni")
 
 ohos_cargo_crate("lib") {
-  crate_name = "clap_lex"
-  crate_type = "rlib"
-  crate_root = "src/lib.rs"
+    crate_name = "clap_lex"
+    crate_type = "rlib"
+    crate_root = "src/lib.rs"
 
-  sources = [ "src/lib.rs" ]
-  edition = "2021"
-  cargo_pkg_version = "0.3.3"
-  cargo_pkg_name = "clap_lex"
-  cargo_pkg_description = "Minimal, flexible command line parser"
-  deps = [ "//third_party/rust/crates/os_str_bytes:lib" ]
+    sources = ["src/lib.rs"]
+    edition = "2021"
+    cargo_pkg_version = "0.3.1"
+    cargo_pkg_name = "clap_lex"
+    cargo_pkg_description = "Minimal, flexible command line parser"
+    deps = ["//third_party/rust/crates/os_str_bytes:lib"]
 }

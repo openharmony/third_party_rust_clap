@@ -139,12 +139,9 @@ impl ArgMatches {
     /// ```
     #[cfg_attr(debug_assertions, track_caller)]
     pub fn get_count(&self, id: &str) -> u8 {
-        *self.get_one::<u8>(id).unwrap_or_else(|| {
-            panic!(
-                "arg `{}`'s `ArgAction` should be `Count` which should provide a default",
-                id
-            )
-        })
+        *self
+            .get_one::<u8>(id)
+            .expect("ArgAction::Count is defaulted")
     }
 
     /// Gets the value of a specific [`ArgAction::SetTrue`][crate::ArgAction::SetTrue] or [`ArgAction::SetFalse`][crate::ArgAction::SetFalse] flag
@@ -176,12 +173,7 @@ impl ArgMatches {
     pub fn get_flag(&self, id: &str) -> bool {
         *self
             .get_one::<bool>(id)
-            .unwrap_or_else(|| {
-                panic!(
-                    "arg `{}`'s `ArgAction` should be one of `SetTrue`, `SetFalse` which should provide a default",
-                    id
-                )
-            })
+            .expect("ArgAction::SetTrue / ArgAction::SetFalse is defaulted")
     }
 
     /// Iterate over values of a specific option or positional argument.
@@ -1310,9 +1302,10 @@ impl ArgMatches {
             if arg == Id::EXTERNAL || self.valid_args.iter().any(|s| *s == arg) {
             } else {
                 panic!(
-                    "`{arg:?}` is not an id of an argument or a group.\n\
+                    "`{:?}` is not an id of an argument or a group.\n\
                      Make sure you're using the name of the argument itself \
-                     and not the name of short or long flags."
+                     and not the name of short or long flags.",
+                    arg
                 );
             }
         }
@@ -1327,7 +1320,7 @@ impl ArgMatches {
         {
             if name.is_empty() || self.valid_subcommands.iter().any(|s| *s == name) {
             } else {
-                panic!("`{name}` is not a name of a subcommand.");
+                panic!("`{}` is not a name of a subcommand.", name);
             }
         }
 

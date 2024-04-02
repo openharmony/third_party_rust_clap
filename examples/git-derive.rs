@@ -53,7 +53,7 @@ enum Commands {
         #[arg(required = true)]
         path: Vec<PathBuf>,
     },
-    Stash(StashArgs),
+    Stash(Stash),
     #[command(external_subcommand)]
     External(Vec<OsString>),
 }
@@ -76,23 +76,23 @@ impl std::fmt::Display for ColorWhen {
 
 #[derive(Debug, Args)]
 #[command(args_conflicts_with_subcommands = true)]
-struct StashArgs {
+struct Stash {
     #[command(subcommand)]
     command: Option<StashCommands>,
 
     #[command(flatten)]
-    push: StashPushArgs,
+    push: StashPush,
 }
 
 #[derive(Debug, Subcommand)]
 enum StashCommands {
-    Push(StashPushArgs),
+    Push(StashPush),
     Pop { stash: Option<String> },
     Apply { stash: Option<String> },
 }
 
 #[derive(Debug, Args)]
-struct StashPushArgs {
+struct StashPush {
     #[arg(short, long)]
     message: Option<String>,
 }
@@ -102,7 +102,7 @@ fn main() {
 
     match args.command {
         Commands::Clone { remote } => {
-            println!("Cloning {remote}");
+            println!("Cloning {}", remote);
         }
         Commands::Diff {
             mut base,
@@ -136,22 +136,22 @@ fn main() {
             );
         }
         Commands::Push { remote } => {
-            println!("Pushing to {remote}");
+            println!("Pushing to {}", remote);
         }
         Commands::Add { path } => {
-            println!("Adding {path:?}");
+            println!("Adding {:?}", path);
         }
         Commands::Stash(stash) => {
             let stash_cmd = stash.command.unwrap_or(StashCommands::Push(stash.push));
             match stash_cmd {
                 StashCommands::Push(push) => {
-                    println!("Pushing {push:?}");
+                    println!("Pushing {:?}", push);
                 }
                 StashCommands::Pop { stash } => {
-                    println!("Popping {stash:?}");
+                    println!("Popping {:?}", stash);
                 }
                 StashCommands::Apply { stash } => {
-                    println!("Applying {stash:?}");
+                    println!("Applying {:?}", stash);
                 }
             }
         }

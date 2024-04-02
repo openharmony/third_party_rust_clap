@@ -95,15 +95,3 @@ fn value_terminator() {
         name,
     );
 }
-
-#[test]
-fn two_multi_valued_arguments() {
-    let name = "my-app";
-    let cmd = common::two_multi_valued_arguments_command(name);
-    common::assert_matches_path(
-        "tests/snapshots/two_multi_valued_arguments.elvish",
-        clap_complete::shells::Elvish,
-        cmd,
-        name,
-    );
-}
