@@ -368,7 +368,8 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                     .get_subcommand_help_heading()
                     .unwrap_or(&default_help_heading),
             );
-            self.header(":\n");
+            self.header(":");
+            self.none("\n");
 
             self.write_subcommands(self.cmd);
         }
@@ -379,7 +380,8 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
             }
             first = false;
             // Write positional args if any
-            self.header("Arguments:\n");
+            self.header("Arguments:");
+            self.none("\n");
             self.write_args(&pos, "Arguments", positional_sort_key);
         }
 
@@ -388,7 +390,8 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                 self.none("\n\n");
             }
             first = false;
-            self.header("Options:\n");
+            self.header("Options:");
+            self.none("\n");
             self.write_args(&non_pos, "Options", option_sort_key);
         }
         if !custom_headings.is_empty() {
@@ -410,7 +413,9 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                         self.none("\n\n");
                     }
                     first = false;
-                    self.header(format!("{}:\n", heading));
+                    self.header(heading);
+                    self.header(":");
+                    self.none("\n");
                     self.write_args(&args, heading, option_sort_key);
                 }
             }
@@ -485,7 +490,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
         debug!("HelpTemplate::short");
 
         if let Some(s) = arg.get_short() {
-            self.literal(format!("-{}", s));
+            self.literal(format!("-{s}"));
         } else if arg.get_long().is_some() {
             self.none("    ");
         }
@@ -498,7 +503,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
             if arg.get_short().is_some() {
                 self.none(", ");
             }
-            self.literal(format!("--{}", long));
+            self.literal(format!("--{long}"));
         }
     }
 
@@ -738,7 +743,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                 .map(|pvs| pvs.to_string_lossy())
                 .map(|pvs| {
                     if pvs.contains(char::is_whitespace) {
-                        Cow::from(format!("{:?}", pvs))
+                        Cow::from(format!("{pvs:?}"))
                     } else {
                         pvs
                     }
@@ -746,7 +751,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                 .collect::<Vec<_>>()
                 .join(" ");
 
-            spec_vals.push(format!("[default: {}]", pvs));
+            spec_vals.push(format!("[default: {pvs}]"));
         }
 
         let als = a
@@ -758,7 +763,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
             .join(", ");
         if !als.is_empty() {
             debug!("HelpTemplate::spec_vals: Found aliases...{:?}", a.aliases);
-            spec_vals.push(format!("[aliases: {}]", als));
+            spec_vals.push(format!("[aliases: {als}]"));
         }
 
         let als = a
@@ -773,7 +778,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                 "HelpTemplate::spec_vals: Found short aliases...{:?}",
                 a.short_aliases
             );
-            spec_vals.push(format!("[short aliases: {}]", als));
+            spec_vals.push(format!("[short aliases: {als}]"));
         }
 
         let possible_vals = a.get_possible_values();
@@ -792,7 +797,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                 .collect::<Vec<_>>()
                 .join(", ");
 
-            spec_vals.push(format!("[possible values: {}]", pvs));
+            spec_vals.push(format!("[possible values: {pvs}]"));
         }
         let connector = if self.use_long { "\n" } else { " " };
         spec_vals.join(connector)
@@ -835,11 +840,11 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
             styled.literal(subcommand.get_name());
             if let Some(short) = subcommand.get_short_flag() {
                 styled.none(", ");
-                styled.literal(format!("-{}", short));
+                styled.literal(format!("-{short}"));
             }
             if let Some(long) = subcommand.get_long_flag() {
                 styled.none(", ");
-                styled.literal(format!("--{}", long));
+                styled.literal(format!("--{long}"));
             }
             longest = longest.max(styled.display_width());
             ord_v.push((subcommand.get_display_order(), styled, subcommand));
@@ -902,7 +907,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
 
         let mut short_als = a
             .get_visible_short_flag_aliases()
-            .map(|a| format!("-{}", a))
+            .map(|a| format!("-{a}"))
             .collect::<Vec<_>>();
         let als = a.get_visible_aliases().map(|s| s.to_string());
         short_als.extend(als);
@@ -916,7 +921,7 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                 "HelpTemplate::spec_vals: Found short flag aliases...{:?}",
                 a.get_all_short_flag_aliases().collect::<Vec<_>>()
             );
-            spec_vals.push(format!("[aliases: {}]", all_als));
+            spec_vals.push(format!("[aliases: {all_als}]"));
         }
 
         spec_vals.join(" ")

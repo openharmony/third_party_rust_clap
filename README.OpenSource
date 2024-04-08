@@ -3,7 +3,7 @@
     "Name": "clap",
     "License": "Apache license 2.0, MIT",
     "License File": "LICENSE-MIT, LICENSE-APACHE",
-    "Version Number": "v4.1.4",
+    "Version Number": "v4.1.13",
     "Owner": "fangting12@huawei.com",
     "Upstream URL": "https://github.com/clap-rs/clap",
     "Description": "A command-line argument parsing library for Rust that supports subcommands and complex argument parsing."
