@@ -13,64 +13,62 @@
 
 import("//build/ohos.gni")
 
-if (host_os != "linux" || host_cpu != "arm64") {
-  ohos_cargo_crate("lib") {
-    crate_name = "clap"
-    crate_type = "rlib"
-    crate_root = "src/lib.rs"
+ohos_cargo_crate("lib") {
+  crate_name = "clap"
+  crate_type = "rlib"
+  crate_root = "src/lib.rs"
 
-    sources = [ "src/lib.rs" ]
-    edition = "2021"
-    cargo_pkg_version = "4.1.13"
-    cargo_pkg_name = "clap"
-    cargo_pkg_description = "A simple to use, efficient, and full-featured Command Line Argument Parser"
-    deps = [
-      "//third_party/rust/crates/bitflags:lib",
-      "//third_party/rust/crates/clap/clap_derive:lib(${host_toolchain})",
-      "//third_party/rust/crates/clap/clap_lex:lib",
-      "//third_party/rust/crates/is-terminal:lib",
-      "//third_party/rust/crates/once_cell:lib",
-      "//third_party/rust/crates/strsim-rs:lib",
-      "//third_party/rust/crates/termcolor:lib",
-    ]
-    features = [
-      "color",
-      "error-context",
-      "help",
-      "std",
-      "suggestions",
-      "usage",
-      "derive",
-    ]
-  }
+  sources = [ "src/lib.rs" ]
+  edition = "2021"
+  cargo_pkg_version = "4.1.13"
+  cargo_pkg_name = "clap"
+  cargo_pkg_description = "A simple to use, efficient, and full-featured Command Line Argument Parser"
+  deps = [
+    "//third_party/rust/crates/bitflags:lib",
+    "//third_party/rust/crates/clap/clap_derive:lib(${host_toolchain})",
+    "//third_party/rust/crates/clap/clap_lex:lib",
+    "//third_party/rust/crates/is-terminal:lib",
+    "//third_party/rust/crates/once_cell:lib",
+    "//third_party/rust/crates/strsim-rs:lib",
+    "//third_party/rust/crates/termcolor:lib",
+  ]
+  features = [
+    "color",
+    "error-context",
+    "help",
+    "std",
+    "suggestions",
+    "usage",
+    "derive",
+  ]
+}
 
-  ohos_cargo_crate("stdio_fixture") {
-    crate_type = "bin"
-    crate_root = "src/bin/stdio-fixture.rs"
+ohos_cargo_crate("stdio_fixture") {
+  crate_type = "bin"
+  crate_root = "src/bin/stdio-fixture.rs"
 
-    sources = [ "src/bin/stdio-fixture.rs" ]
-    edition = "2021"
-    cargo_pkg_version = "4.1.13"
-    cargo_pkg_name = "clap"
-    cargo_pkg_description = "A simple to use, efficient, and full-featured Command Line Argument Parser"
-    deps = [
-      "//third_party/rust/crates/bitflags:lib",
-      "//third_party/rust/crates/clap:lib",
-      "//third_party/rust/crates/clap/clap_derive:lib(${host_toolchain})",
-      "//third_party/rust/crates/clap/clap_lex:lib",
-      "//third_party/rust/crates/is-terminal:lib",
-      "//third_party/rust/crates/once_cell:lib",
-      "//third_party/rust/crates/strsim-rs:lib",
-      "//third_party/rust/crates/termcolor:lib",
-    ]
-    features = [
-      "color",
-      "error-context",
-      "help",
-      "std",
-      "suggestions",
-      "usage",
-      "derive",
-    ]
-  }
+  sources = [ "src/bin/stdio-fixture.rs" ]
+  edition = "2021"
+  cargo_pkg_version = "4.1.13"
+  cargo_pkg_name = "clap"
+  cargo_pkg_description = "A simple to use, efficient, and full-featured Command Line Argument Parser"
+  deps = [
+    "//third_party/rust/crates/bitflags:lib",
+    "//third_party/rust/crates/clap:lib",
+    "//third_party/rust/crates/clap/clap_derive:lib(${host_toolchain})",
+    "//third_party/rust/crates/clap/clap_lex:lib",
+    "//third_party/rust/crates/is-terminal:lib",
+    "//third_party/rust/crates/once_cell:lib",
+    "//third_party/rust/crates/strsim-rs:lib",
+    "//third_party/rust/crates/termcolor:lib",
+  ]
+  features = [
+    "color",
+    "error-context",
+    "help",
+    "std",
+    "suggestions",
+    "usage",
+    "derive",
+  ]
 }
