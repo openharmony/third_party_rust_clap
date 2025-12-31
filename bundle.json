@@ -1,0 +1,37 @@
+{
+  "name": "@ohos/rust_clap",
+  "description": "A command-line argument parsing library for Rust that supports subcommands and complex argument parsing.",
+  "version": "6.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "third_party/rust/crates/clap"
+  },
+  "dirs": {},
+  "scripts": {},
+  "readmePath": {
+    "en": "README.md"
+  },
+  "component": {
+    "name": "rust_clap",
+    "subsystem": "thirdparty",
+    "adapted_system_type": [
+      "standard"
+    ],
+    "deps": {
+      "components": []
+    },
+    "build": {
+      "sub_component": [],
+      "inner_kits": [
+        {
+          "name": "//third_party/rust/crates/clap:lib"
+        },
+        {
+          "name": "//third_party/rust/crates/clap:stdio_fixture"
+        }
+      ],
+      "test": []
+    }
+  }
+}

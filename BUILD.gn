@@ -42,6 +42,9 @@ if (host_os != "linux" || host_cpu != "arm64") {
       "usage",
       "derive",
     ]
+    module_output_extension = ".rlib"
+    part_name = "rust_clap"
+    subsystem_name = "thirdparty"
   }
 
   ohos_cargo_crate("stdio_fixture") {
@@ -72,5 +75,7 @@ if (host_os != "linux" || host_cpu != "arm64") {
       "usage",
       "derive",
     ]
+    part_name = "rust_clap"
+    subsystem_name = "thirdparty"
   }
 }
